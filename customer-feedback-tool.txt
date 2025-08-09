@@ -1,0 +1,219 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"customer_id\": \"60146356452\",\n  \"name\": \"Jerry | unknown(default)\",\n  \"sentiment\": \"Positive | Neutral | Negative\",\n  \"review_type\": \"Praise | Complaint | Suggestion | Bug Report | Feature Request | General Feedback\",\n  \"feedback_focus\": \"App Experience | Customer Support | Transaction Process | Onboarding/KYC | Speed/Performance | UI/UX Design | Other\",\n  \"comment\": \"User's actual review message here\"\n}"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -64,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "listId": "=6882e7a4d69fc06fb3620738",
+        "name": "={{  $json.customer_id }} Negative Feedback",
+        "description": "=Customer Summary\n\n- Name: {{ $json.name }}\n- Contact: {{  $json.customer_id }}\n- Date of Request: {{ $now.setZone('Asia/Kuala_Lumpur').toFormat('d/M/yyyy') }}\n- Sentiment: {{  $json.sentiment }}\n- Review Type:{{  $json.review_type }}\n- Feedback Focus:{{  $json.feedback_focus }}\n- Comment: {{  $json.comment }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        832,
+        272
+      ],
+      "id": "a73bb38c-c08a-4959-80e9-06d432af5967",
+      "name": "create negative card",
+      "credentials": {
+        "trelloApi": {
+          "id": "jU7VRasRSS9oTtuK",
+          "name": "Trello account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e88ba510-0a4b-4256-aa55-9bcadb282de9",
+                    "leftValue": "={{ $json.sentiment }}",
+                    "rightValue": "Negative",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Negative"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.sentiment }}",
+                    "rightValue": "Positive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fe1a75cf-d9e9-4aaf-b5ab-60960796da16"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Positive"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5faf101b-3093-4aec-9748-9a7225e59750",
+                    "leftValue": "={{ $json.sentiment }}",
+                    "rightValue": "Neutral",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Neutral"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        512
+      ],
+      "id": "253a26e9-f64b-4320-b675-69617dcc7dbe",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "listId": "=6882e7a4d69fc06fb3620738",
+        "name": "={{  $json.customer_id }} Positive Feedback",
+        "description": "=Customer Summary\n\n- Name: {{ $json.name }}\n- Contact: {{  $json.customer_id }}\n- Date of Request: {{ $now.setZone('Asia/Kuala_Lumpur').toFormat('d/M/yyyy') }}\n- Sentiment: {{  $json.sentiment }}\n- Review Type:{{  $json.review_type }}\n- Feedback Focus:{{  $json.feedback_focus }}\n- Comment: {{  $json.comment }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        832,
+        448
+      ],
+      "id": "efeb1364-a741-4b51-abbd-1cba11f4f04d",
+      "name": "Create Positive Card",
+      "credentials": {
+        "trelloApi": {
+          "id": "jU7VRasRSS9oTtuK",
+          "name": "Trello account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "listId": "=6882e7a4d69fc06fb3620738",
+        "name": "={{  $json.customer_id }} Neutral Feedback",
+        "description": "=Customer Summary\n\n- Name: {{ $json.name }}\n- Contact: {{  $json.customer_id }}\n- Date of Request: {{ $now.setZone('Asia/Kuala_Lumpur').toFormat('d/M/yyyy') }}\n- Sentiment: {{  $json.sentiment }}\n- Review Type:{{  $json.review_type }}\n- Feedback Focus:{{  $json.feedback_focus }}\n- Comment: {{  $json.comment }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        832,
+        640
+      ],
+      "id": "543c62c1-8df5-4716-a722-118b783c902a",
+      "name": "Create Neutral Card",
+      "credentials": {
+        "trelloApi": {
+          "id": "jU7VRasRSS9oTtuK",
+          "name": "Trello account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "create negative card",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Positive Card",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Neutral Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bff9c7e9dd8fc8f0d8a002c9b32b52b73fa1658715f6878f4df7feea56a1e1e4"
+  }
+}

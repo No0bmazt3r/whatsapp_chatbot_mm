@@ -1,0 +1,39 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "1234567890",
+              "phone_number_id": "9876543210"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "John Doe"
+                },
+                "wa_id": "60146356452"
+              }
+            ],
+            "messages": [
+              {
+                "from": "60146356452",
+                "id": "wamid.HBgMAbCdEf123451",
+                "timestamp": "1687863434",
+                "text": {
+                  "body": "what about the other 2 ? MY0005s99WN4AEsQOsFsssW, MY0000CQ21W59X4P9"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}

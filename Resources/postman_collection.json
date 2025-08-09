@@ -1,0 +1,37 @@
+{
+	"info": {
+		"_postman_id": "a8a0b3a6-d54a-4e36-9c7c-210d81414444",
+		"name": "Gemini Chatbot API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Webhook",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"object\": \"whatsapp_business_account\",\n  \"entry\": [\n    {\n      \"id\": \"WHATSAPP_BUSINESS_ACCOUNT_ID\",\n      \"changes\": [\n        {\n          \"value\": {\n            \"messaging_product\": \"whatsapp\",\n            \"metadata\": {\n              \"display_phone_number\": \"1234567890\",\n              \"phone_number_id\": \"9876543210\"\n            },\n            \"contacts\": [\n              {\n                \"profile\": {\n                  \"name\": \"John Doe\"\n                },\n                \"wa_id\": \"60146356452\"\n              }\n            ],\n            \"messages\": [\n              {\n                \"from\": \"60146356452\",\n                \"id\": \"wamid.HBgMAbCdEf123451\",\n                \"timestamp\": \"1687863434\",\n                \"text\": {\n                  \"body\": \"what about the other 2 ? MY0005s99WN4AEsQOsFsssW, MY0000CQ21W59X4P9\"\n                },\n                \"type\": \"text\"\n              }\n            ]\n          },\n          \"field\": \"messages\"\n        }\n      ]\n    }\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/webhook",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"webhook"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

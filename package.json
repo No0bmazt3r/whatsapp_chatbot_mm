@@ -1,0 +1,27 @@
+{
+  "name": "whatsapp-chatbot-gemini",
+  "version": "1.0.0",
+  "description": "A WhatsApp chatbot powered by Google Gemini.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "chatbot",
+    "gemini",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.15.0",
+    "axios": "^1.7.2",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.3.1",
+    "googleapis": "^140.0.0",
+    "mongodb": "^6.8.0"
+  }
+}

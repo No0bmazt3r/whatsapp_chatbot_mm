@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"customer_id\": \"60146356452\",\n  \"business_name\": \"Acme Corp\",\n  \"contact_name\": \"John Doe\",\n  \"contact_number\": \"+60123456789\",\n  \"email\": \"john.doe@acme.com\",\n  \"preferred_time\": \"2025-07-24T10:30:00+08:00\",\n  \"preferred_end_time\": \"2025-07-24T12:30:00+08:00\",\n  \"notes\": \"Interested in enterprise plan\",\n  \"estimated_transaction_value\": \"RM 50,000\"\n}\n"
+      },
+      "id": "30f7952e-e42d-41a9-ab01-5be0852cf123",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -384,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "jerrychee@moneymatch.co",
+          "mode": "list",
+          "cachedResultName": "jerrychee@moneymatch.co"
+        },
+        "start": "={{ $json.preferred_time }}",
+        "end": "={{ $json.preferred_end_time }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $json.email }}"
+          ],
+          "description": "={{ $json.contact_name }} from {{ $json.business_name }} [{{ $json.notes }}] ",
+          "summary": "={{ $json.business_name }} business onboarding"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        160
+      ],
+      "id": "247d687d-10f2-401c-aad1-f901e9e980ca",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "uJVGc3MayENm5Q2G",
+          "name": "jerry Gcal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "listId": "6882e71e0804f1b3c19505bc",
+        "name": "={{ $('When Executed by Another Workflow').item.json.customer_id }}",
+        "description": "=Customer Name: {{ $('When Executed by Another Workflow').item.json.contact_name }}\n\nBusiness Name: {{ $('When Executed by Another Workflow').item.json.business_name }}\n\nContact Number: {{ $('When Executed by Another Workflow').item.json.contact_number }}\n\nEmail: {{ $('When Executed by Another Workflow').item.json.email }}\n\nPreferred Contact Time: {{ $('When Executed by Another Workflow').item.json.preferred_time }} to {{ $('When Executed by Another Workflow').item.json.preferred_end_time }}\n\nEstimated Transaction Value: {{ $('When Executed by Another Workflow').item.json.estimated_transaction_value }}\n\nTriggered By: User request\n\nAdditional Notes: Preferred contact method is phone call.\n\nMeeting link: {{ $json.htmlLink }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        400,
+        160
+      ],
+      "id": "0bfc82aa-804a-49f0-bb82-21d8dbbcba80",
+      "name": "Create a card",
+      "credentials": {
+        "trelloApi": {
+          "id": "jU7VRasRSS9oTtuK",
+          "name": "Trello account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Create a card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a card": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "customer_id": "60146356452",
+        "business_name": "Sharvin Sdn.Bhd.",
+        "contact_name": "Sharvin",
+        "contact_number": "60146356452",
+        "preferred_time": "2024-07-24T15:00:00+08:00",
+        "preferred_end_time": "2024-07-24T16:00:00+08:00",
+        "email": "sharvinkanesan7@gmail.com",
+        "notes": "Preferred contact method is phone call.",
+        "triggered_by": "user_request",
+        "estimated_transaction_value": "RM 15000"
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bff9c7e9dd8fc8f0d8a002c9b32b52b73fa1658715f6878f4df7feea56a1e1e4"
+  }
+}

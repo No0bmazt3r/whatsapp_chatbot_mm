@@ -1,0 +1,1193 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "description": "Call this tool with user intend to talk to human or MoneyMatch customer service personnel. Also call this tool if user is unhappy with the replies AI. Confirm with user before calling this tool. Provide name (if possible or \"unknown\" by default), handover to customer service flag, check if user intend to ban AI response, customer's emotion and patience level.\n\nExample input parameters for Talk to Human Agent:\n\n{\n  \"name\": \"Jerry|unknown(default)\",\n  \"handover_to_customer_service\": true,\n  \"emotion\": \"Relief | Convenience | Satisfaction | Curiosity | Confidence | Trust | Frustration | Annoyance | Impatience | Confusion | Distrust | Skepticism | Anxiety | Stress | Indifference | Cautious Optimism\",\n  \"patience_level\": \"Low|Moderate|High\",\n  \"ban_ai_response\": false\n}",
+        "workflowId": {
+          "__rl": true,
+          "value": "S8b93s9ms4E1A9nI",
+          "mode": "list",
+          "cachedResultName": "chat with human"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "emotion": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('emotion', ``, 'string') }}",
+            "patience_level": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('patience_level', ``, 'string') }}",
+            "ban_ai_response": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ban_ai_response', ``, 'boolean') }}",
+            "handover_to_customer_service": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('handover_to_customer_service', ``, 'boolean') }}",
+            "customer_id": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "handover_to_customer_service",
+              "displayName": "handover_to_customer_service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "emotion",
+              "displayName": "emotion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "patience_level",
+              "displayName": "patience_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ban_ai_response",
+              "displayName": "ban_ai_response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        480
+      ],
+      "id": "7a4800f1-0539-4e8b-98ff-bd8198b9a6c6",
+      "name": "chat with human tool"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=Role:\nYou are Aida, a friendly and knowledgeable AI assistant representing MoneyMatch. You assist customers on WhatsApp by giving accurate, concise, and helpful responses in a warm, conversational tone. Keep your replies short and human-like — like you're chatting with a friend.\nIf the answer is long, give a brief summary and share a helpful link using the URL from the metadata (e.g. metadata.url). Format links like:\n👉 Read more (https://example.com)\n\nAlways introduce yourself as an AI assistant and mention that your answers may be inaccurate. Let customers know they can speak to a human support agent if needed.\n\nMessage Style Guideline:\nIdeal response length: 300–500 characters\nMaximum response length: 4096 characters\nUse short paragraphs, line breaks, and emoji for readability\nIf content is long, summarize and share a link using the metadata URL:\nExample: “Here’s a quick summary! 👉 Read more”\nAvoid technical jargon and keep the tone helpful, casual, and respectful\n\nScope:\n1. General Inquiries\n- What is MoneyMatch?\n- Is it licensed and regulated?\n- Which countries are supported?\n\n2. Remittance Services\n- How to send money internationally\n- Exchange rates, transfer fees, and timelines\n- Minimum/maximum transfer limits\n- Currency availability and supported corridors\n\n3. User Account Help\n- How to register and verify an account (eKYC)\n- Common issues during signup or verification\n- Resetting passwords or unlocking accounts\n\n4. SME/Business Services\n- Overview of MoneyMatch for Business / Pulse\n- Supported transaction types (e.g., bulk payouts)\n- Business account onboarding requirements\n\n5. Compliance & Security\n- Why documents are required\n- AML/CFT compliance information\n- How user data is protected\n\n6. Platform Navigation\n- Website navigation assistance\n- Redirecting to help center articles\n- Guidance on using the mobile app or desktop version\n\n7. Escalation & Live Support\n- Letting users know when to contact live agents\n- Sharing contact links or support portal information"
+        }
+      },
+      "id": "8e6a398f-67a9-422e-8d5f-fcc080c1b56b",
+      "name": "Master Routing Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        432,
+        0
+      ],
+      "typeVersion": 1.7,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "id": "e466ec09-0e12-4c83-a32f-46bf8307135d",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        272,
+        304
+      ],
+      "typeVersion": 1.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "content": "# STEP 1\n\n## RAG System\n\n\n\n\n\n\n\n\n\n\n\n\n\n* *Respond* webhook receives various POST Requests from Meta regarding WhatsApp messages (user messages + status notifications)\n* Check if the incoming JSON contains user message\n* Echo back the text message to the user. This is a custom message, not a WhatsApp Business template message",
+        "height": 445,
+        "width": 619
+      },
+      "id": "da3a1888-0320-4717-a74f-4e1836d31994",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2000,
+        -160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "/whatsapp-auth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e662e7c3-743c-4e39-9203-6b597e666122",
+      "name": "Respond1",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -1968,
+        0
+      ],
+      "webhookId": "f0d2e6f6-8fda-424d-b377-0bd191343c20",
+      "typeVersion": 2,
+      "notes": "test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  const query = item.json.query || {};\n  const VERIFY_TOKEN = 'jerry';\n\n  if (\n    query['hub.mode'] === 'subscribe' &&\n    query['hub.verify_token'] === VERIFY_TOKEN\n  ) {\n    // Set the response to the challenge\n    item.json.response = query['hub.challenge'];\n    item.json.status = 200;\n  } else {\n    // Set forbidden response\n    item.json.response = 'Forbidden';\n    item.json.status = 403;\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1776,
+        -144
+      ],
+      "id": "b8b35640-d97e-4279-bcc8-113583d339b3",
+      "name": "header validation"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {
+          "responseCode": "={{ $json.status }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1584,
+        -144
+      ],
+      "id": "e5cdd9c3-22a3-47b4-842e-5c97b17a5e0f",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1328,
+        -144
+      ],
+      "id": "bdbfec82-0e14-4619-8ee0-3e2c9efd375f",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "description": "=Use this tool when the user intends to provide feedback about their experience with MoneyMatch.\n\nTrigger this when the user explicitly shares a review, complaint, praise, suggestion, or any relevant feedback — whether positive or negative. Confirm with the user before submitting.\n\nCollect the following details:\n\n{\n  \"customer_id\": \"60146356452\",\n  \"name\": \"Jerry | unknown(default)\",\n  \"sentiment\": \"Positive | Neutral | Negative\",\n  \"review_type\": \"Praise | Complaint | Suggestion | Bug Report | Feature Request | General Feedback\",\n  \"feedback_focus\": \"App Experience | Customer Support | Transaction Process | Onboarding/KYC | Speed/Performance | UI/UX Design | Other\",\n  \"comment\": \"User's actual review message here\"\n}",
+        "workflowId": {
+          "__rl": true,
+          "value": "n0CM7UtHtVbrq36i",
+          "mode": "list",
+          "cachedResultName": "customer feedback tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}",
+            "sentiment": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('sentiment', ``, 'string') }}",
+            "review_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('review_type', ``, 'string') }}",
+            "feedback_focus": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('feedback_focus', ``, 'string') }}",
+            "comment": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('comment', ``, 'string') }}",
+            "customer_id": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].from }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "review_type",
+              "displayName": "review_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feedback_focus",
+              "displayName": "feedback_focus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        576
+      ],
+      "id": "0ce64e16-8ec5-47d7-a24d-bb7b6b2f65d8",
+      "name": "customer feedback tool"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        512
+      ],
+      "id": "b9145dbf-72f8-4333-a38b-1e21ab9c6f81",
+      "name": "reinforced training tool",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "description": "=Call this tool to initiate the business onboarding workflow. It collects essential business information, schedules a meeting via calendar integration, sends confirmation to the user (e.g., via WhatsApp), notifies internal teams, and logs the data in the CRM or tracking system. Ask all these information below before calling this tool.\n\n{\n \"customer_id\": \"60146356452\",\n  \"business_name\": \"Acme Corp\",\n  \"contact_name\": \"John Doe\",\n  \"email\": \"john.doe@acme.com\",\n  \"preferred_time\": \"2025-07-24T10:30:00+08:00\",\n  \"preferred_end_time\": \"2025-07-24T12:30:00+08:00\",\n  \"notes\": \"Interested in enterprise plan\",\n  \"estimated_transaction_value\": \"RM 50,000\"\n}\n\nPreferred Time Format Instruction:\n  - Today's date time is {{ $now }}\n  - If the user provides a natural time expression like “around 2 – 4pm today”, extract and convert it into:\n    - `preferred_time`: the start time in ISO 8601 format (e.g. `2025-07-25T14:00:00+08:00`)\n    - `preferred_end_time`: the end time in ISO 8601 format (e.g. `2025-07-25T16:00:00+08:00`)\n    - Always assume:\n      - The date is **today**, unless stated otherwise\n      - The **current year** must be used\n      - The **timezone is Asia/Kuala\\_Lumpur (UTC+08:00)**",
+        "workflowId": {
+          "__rl": true,
+          "value": "Xo4zOzWHyGkl1NWg",
+          "mode": "list",
+          "cachedResultName": "business onboarding tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_id": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "business_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('business_name', ``, 'string') }}",
+            "contact_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('contact_name', ``, 'string') }}",
+            "preferred_time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('preferred_time', ``, 'string') }}",
+            "contact_number": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+            "preferred_end_time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('preferred_end_time', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+            "notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('notes', ``, 'string') }}",
+            "estimated_transaction_value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('estimated_transaction_value', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "business_name",
+              "displayName": "business_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "contact_name",
+              "displayName": "contact_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "preferred_end_time",
+              "displayName": "preferred_end_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "estimated_transaction_value",
+              "displayName": "estimated_transaction_value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        528
+      ],
+      "id": "7c12222b-89f4-4138-a138-26b311978b6f",
+      "name": "business onboarding tool"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1632,
+        480
+      ],
+      "id": "8f1affaa-bc9c-41f4-9843-e8284b29a5f7",
+      "name": "request for quote tool",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "You are an AI assistant for MoneyMatch.\n\nUse the Pinecone tool to retrieve information if the user's question is about:\n- Remittance, sending/receiving money, or cross-border payments\n- How to use or operate the MoneyMatch app\n- Compliance, KYC, AML, verification, or regulations\n\nOtherwise, answer directly if you can, or say you don't know.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n-comms-chat-aug",
+          "mode": "list",
+          "cachedResultName": "n8n-comms-chat-aug"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        480
+      ],
+      "id": "80e670bd-856f-4daa-a53b-e7276c03b5ef",
+      "name": "Pinecone Vector Store",
+      "alwaysOutputData": true,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "en"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -160,
+        288
+      ],
+      "id": "85602b09-8154-4076-ad68-f91685a6b87c",
+      "name": "Transcribe a recording",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "632190063320848",
+        "recipientPhoneNumber": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "80f113e5-9c0b-48f9-b3a1-c552924080f9",
+      "name": "Send",
+      "type": "n8n-nodes-base.whatsApp",
+      "position": [
+        1328,
+        0
+      ],
+      "typeVersion": 1,
+      "webhookId": "2ad50274-4c5f-4d99-a3a5-9493680a19eb",
+      "alwaysOutputData": true,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        288
+      ],
+      "id": "9204f62f-0904-424b-8c3f-52615b9d81bf",
+      "name": "Download media",
+      "webhookId": "37ca8c30-2b69-4f99-ac4a-9f65c6b09431",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -368,
+        288
+      ],
+      "id": "61b2e629-b9b8-4201-935d-02549e032c0f",
+      "name": "download audio",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6c3f0176-d53e-4bc8-abdd-ff4edbdd5382",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        288
+      ],
+      "id": "2fb8bafe-30c8-4669-aa54-2bc642025f71",
+      "name": "Audio prompt"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e88ba510-0a4b-4256-aa55-9bcadb282de9",
+                    "leftValue": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fe1a75cf-d9e9-4aaf-b5ab-60960796da16"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -816,
+        32
+      ],
+      "id": "b8ec9ae8-637b-4558-95f3-bd1d0d4a7858",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6c3f0176-d53e-4bc8-abdd-ff4edbdd5382",
+              "name": "text",
+              "value": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "4fbb6cb7-8069-428a-ac82-3f03b69bdf2a",
+      "name": "text prompt"
+    },
+    {
+      "parameters": {
+        "content": "# STEP 2\n\n## Chat with human checker\n\n* *QUERY* check db and see if chat with human still enabled. if disabled, then allow to call AI Agent",
+        "height": 400,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1296,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "4d6e6b0e-2434-4bcd-a685-24a6a470aaf1",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_settings",
+          "mode": "list",
+          "cachedResultName": "user_settings"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.body.entry[0].changes[0].value.messages[0].from }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1248,
+        0
+      ],
+      "id": "9a5c8639-8c48-4e6f-9c16-c70e501d15c2",
+      "name": "Select rows from a table",
+      "alwaysOutputData": true,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "959fbffc-876a-4235-87be-2dedba4926cd",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.handover_to_customer_service }}",
+              "rightValue": "text"
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "f5d713ad-239c-4e66-af09-c5cfd078d3b6",
+      "name": "speak with human ?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -1056,
+        0
+      ],
+      "typeVersion": 2.2,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "959fbffc-876a-4235-87be-2dedba4926cd",
+              "operator": {
+                "type": "boolean",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.messages }}",
+              "rightValue": "messages"
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "28d2cbe0-760b-4850-9c74-89b255ddae1f",
+      "name": "is Message?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -1584,
+        32
+      ],
+      "typeVersion": 2.2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "description": "Command: Query Order Status Tool\n\n-Trigger when:\n  - The user expresses an intent to check the status of one or more transfer orders.\n  - The user provides at least one valid reference ID.\n  - “What’s the status of this order: `MY0000CQ21W56BHQ2`?”\n  - “Can you check `RFXSG00AB123456XYZ` and `MY0000FF88TT7788`?”\n  - “I haven’t received any update on `NZ00XYZ123ABCDEF`.”\n  - “Where is my transfer? Reference is `RFXAU00XYZ891011`.”\n\n- Reference ID Requirements:\n  - Must begin with one of the following prefixes:\n    - **MY**, **SG**, **NZ**, **BN**, **AU**\n    - **RFXMY**, **RFXSG**, **RFXNZ**, **RFXBN**, **RFXAU**\n  - Example valid order references:\n    - `MY0000CQ21W56BHQ2`\n    - `RFXMY00CQ11W589BHQ2`\n\nDo NOT trigger if:\n- No reference ID is provided.\n- The ID format does not match the specified prefix pattern.\n- The inquiry is not related to transfer status.\n\nExample of the data:\n{\n  \"customer_id\": \"60146356452\",\n  \"order_ids\": \"MY0005s99WN4AEsQOsFsssW, MY0000CQ21W56BHQ2, MY0000CQ21W59X4P9\"\n}",
+        "workflowId": {
+          "__rl": true,
+          "value": "lZ7xSGnghP1Jpw1u",
+          "mode": "list",
+          "cachedResultName": "query order status"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_ids": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_ids', ``, 'string') }}",
+            "customer_id": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].from }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "order_ids",
+              "displayName": "order_ids",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        448
+      ],
+      "id": "004bb474-0f0e-4c89-bd1f-a64cac192c15",
+      "name": "query order status"
+    },
+    {
+      "parameters": {
+        "content": "# STEP 3\n\n## Normalize user Input\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIt could be image, voice note, text. I just need convert all of them into the same format",
+        "height": 640,
+        "width": 1040
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -848,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "df4307fb-31c4-45a6-bc7e-102f7a11fb89",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        480
+      ],
+      "id": "6835e6d8-fd95-4dc3-8aa0-d1a02651f7f3",
+      "name": "report bug tool",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        528
+      ],
+      "id": "9ec045f3-e7fe-4be3-b8d3-119e5fe2bd68",
+      "name": "reset device identifier tool",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        608
+      ],
+      "id": "b9c9749e-6d8a-4346-a42a-7ebeba6abdac",
+      "name": "Embeddings OpenAI4",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Respond1').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+        "collectionName": "ai",
+        "databaseName": "n8n-chat-history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        544,
+        352
+      ],
+      "id": "c7848c3e-7567-42db-abcd-0b72603e079c",
+      "name": "MongoDB Chat Memory",
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "chat with human tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Master Routing Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond1": {
+      "main": [
+        [
+          {
+            "node": "header validation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "is Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "header validation": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "customer feedback tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reinforced training tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "business onboarding tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "request for quote tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Audio prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media": {
+      "main": [
+        [
+          {
+            "node": "download audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download audio": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio prompt": {
+      "main": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "text prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text prompt": {
+      "main": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select rows from a table": {
+      "main": [
+        [
+          {
+            "node": "speak with human ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "speak with human ?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is Message?": {
+      "main": [
+        [
+          {
+            "node": "Select rows from a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "query order status": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "report bug tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reset device identifier tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI4": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Master Routing Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bff9c7e9dd8fc8f0d8a002c9b32b52b73fa1658715f6878f4df7feea56a1e1e4"
+  }
+}

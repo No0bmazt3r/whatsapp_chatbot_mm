@@ -1,0 +1,402 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"customer_id\": \"60146356452\",\n  \"name\": \"jerry|unknown\",\n  \"handover_to_customer_service\": true,\n  \"emotion\": \"Relief | Convenience | Satisfaction | Curiosity | Confidence | Trust | Frustration | Annoyance | Impatience | Confusion | Distrust | Skepticism | Anxiety | Stress | Indifference | Cautious Optimism\",\n  \"patience_level\": \"Low|Moderate|High\",\n  \"ban_ai_response\": false\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "e7ca9bbb-8fdb-45da-a0bf-f4a048e598c1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user_settings",
+          "mode": "list",
+          "cachedResultName": "user_settings"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.customer_id }}",
+            "created_at": "={{ $now }}",
+            "updated_at": "={{ $now }}",
+            "sender_id": "={{ $json.customer_id }}",
+            "handover_to_customer_service": "={{ $json.handover_to_customer_service }}",
+            "name": "={{ $json.name }}",
+            "emotion": "={{ $json.emotion }}",
+            "patience_level": "={{ $json.patience_level }}",
+            "ban_ai_response": "={{ $json.ban_ai_response }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sender_id",
+              "displayName": "sender_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "handover_to_customer_service",
+              "displayName": "handover_to_customer_service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "emotion",
+              "displayName": "emotion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "patience_level",
+              "displayName": "patience_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "ban_ai_response",
+              "displayName": "ban_ai_response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        192,
+        0
+      ],
+      "id": "fc9b7953-654c-4f4f-9190-d19be2590d78",
+      "name": "Insert or update rows in a table",
+      "alwaysOutputData": false,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "operation": "getCards",
+        "id": "687f1d88820773b4021efae4",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        608,
+        -240
+      ],
+      "id": "48aa8c20-e737-47fb-a6b0-71b620bf42ff",
+      "name": "Get all cards in a list",
+      "alwaysOutputData": true,
+      "credentials": {
+        "trelloApi": {
+          "id": "jU7VRasRSS9oTtuK",
+          "name": "Trello account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3e077a84-83b9-4ac6-8f7d-04ffea8f637d",
+              "leftValue": "={{ $json.handover_to_customer_service }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "9559ebda-25fa-48dc-86d7-ff51a31518eb",
+      "name": "check if should create/update trello"
+    },
+    {
+      "parameters": {
+        "jsCode": "const targetName = String($('Insert or update rows in a table').first().json.id);\n\n\nlet found = false;\n\n// Check if any item matches\nfor (const item of $input.all()) {\n  let name = item.json.name;\n\n  if (name === targetName) {\n    found = true;\n  }\n}\n\n// Add the result to each item and return all items\nfor (const item of $input.all()) {\n    item.json.targetName = targetName;\n\n  item.json.nameMatch = found;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -240
+      ],
+      "id": "c07a21d6-335a-462e-b0fe-b2b95113a4a3",
+      "name": "compare match card name"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3e077a84-83b9-4ac6-8f7d-04ffea8f637d",
+              "leftValue": "={{ $json.nameMatch }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        -240
+      ],
+      "id": "58d1f018-8114-442b-8fb4-fc45dcbc7774",
+      "name": "match ?"
+    },
+    {
+      "parameters": {
+        "listId": "687f1d88820773b4021efae4",
+        "name": "={{ $('When Executed by Another Workflow').item.json.customer_id }}",
+        "description": "=Customer Summary\n\n- Name: {{ $('When Executed by Another Workflow').item.json.name }}\n- Contact: {{ $('When Executed by Another Workflow').item.json.customer_id }}\n- Date of Request: {{ $now.setZone('Asia/Kuala_Lumpur').toFormat('d/M/yyyy HH:mm:ss') }}\n- Emotion: {{ $('When Executed by Another Workflow').item.json.emotion }}\n- Patience Level: {{ $('When Executed by Another Workflow').item.json.patience_level }}\n- Customer intend to handover to Customer Service: {{ $('When Executed by Another Workflow').item.json.output.metadata.handover_to_customer_service }}\n- Customer intend to ban AI reply: {{ $('When Executed by Another Workflow').item.json.output.metadata.ban_ai_response }}\n- shortcut WA link: https://wa.me/{{ $('When Executed by Another Workflow').item.json.customer_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        -128
+      ],
+      "id": "ca9cff5b-68a3-4579-941a-e1c779701da6",
+      "name": "Create a card",
+      "credentials": {
+        "trelloApi": {
+          "id": "jU7VRasRSS9oTtuK",
+          "name": "Trello account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "How to get trello api token and secret ?\n\n- ensure you have admin access\n- visit https://trello.com/power-ups/admin\n- create a power up\n- fill up fill in name, workspace, email, support contact, author\n- create key\n- copy they API_KEY\n- click \"Generate Token\"\n- Authorize this app\n- Copy the API_SECRET",
+        "height": 280,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        -544
+      ],
+      "typeVersion": 1,
+      "id": "0dda3b41-1f71-4531-9312-a150336c62db",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"message\": \"we have notified the customer service. We will get back to you soon!\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1552,
+        -224
+      ],
+      "id": "3c2df77d-6324-4b76-83b8-fa04e4446803",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert or update rows in a table": {
+      "main": [
+        [
+          {
+            "node": "check if should create/update trello",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all cards in a list": {
+      "main": [
+        [
+          {
+            "node": "compare match card name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check if should create/update trello": {
+      "main": [
+        [
+          {
+            "node": "Get all cards in a list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "compare match card name": {
+      "main": [
+        [
+          {
+            "node": "match ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "match ?": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a card": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "bff9c7e9dd8fc8f0d8a002c9b32b52b73fa1658715f6878f4df7feea56a1e1e4"
+  }
+}

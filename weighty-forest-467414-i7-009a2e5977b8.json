@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "weighty-forest-467414-i7",
+  "private_key_id": "009a2e5977b8a2d8ad576e258be956a9202094f4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDyJm6jYTu0ZAVk\ntOcCSpcUblWBEZboba5NEd/MbJvFA5/eBFN2MEagbKi7F+MiS1KzHRomHK9BPv2/\n5F+8Zz6UqyZ1ZcfA8keFXbdDlYZyQILJL+SlH+MGRdHjkif7d1ZHgp9m6f8a+6S9\nYEqMDI3QGGkvkvR2aNWjIkgzz+0nKXTmwn08nzE33f3l+86mlili2ofEDhLUd4vu\nzFqUNnqD9f9tLEFJ1gUGUKIeHl2lhIY1xrlTDeovPA+WLR7MQ58eRVwrX67tOiOL\ngqMSG+1UmzQfRoYnQDnfQq2JzFaLnWuWxjWVqcniy1VyQhXA+ejMTw2ILq4meJBa\n9uq5DGaVAgMBAAECggEAA9yvjo0GNAAVYvAMsClq4/FHjVWvu7jGGyYSFPNVf6yp\nX9PfVeb6tWPORB+jKICdisxHxrxV4jtENkuI6FsYMSxSonQzXaUvlVWzjtEjcg6L\n13QbWDPcPdUevhuuZhEW7/CKJMzOHArP65JN1hJ8L4m4IcFdA0d0QtQQ5TynemSj\nrngrCwSwShhZxxSgEeA2QYliooq2ND9bGIGDHq/Y2qwiAuhKjPJCBJk+B0qJALed\nUkx5Gq/SHg5J+ocJONQKOvbXxz5C1HVlke3Bhqu+8htKeAVnktwzL9U1Aju+1ZuY\nY84Sd4y43pCieybZrxRNAqNqMu/vFbS2OZ5CNv4jcQKBgQD9MJjaaQ47waZ5wdtH\nRDt1X780WjL7H+lk92jZnmAvNGDnvRxlSK/Dhiu3C9Bnsl0WGNMdL5gZIppjBcXP\nZhnSRzF2wH87fw/go+/lJveOWcYvS0gYnMw+C5lz781v/yGgjBQjmxcRWIgpCndT\n8va7e47Rki/pwfCnnez+18ESMQKBgQD01nejo1Jt8/KaYlwhIYEvJQ3vkPUtY/Z2\n1+PuonNmEDaSE01IYi8FOYtS6IfPzacnJiAGZL/EthN9tROMarD68eDVK62sgOgw\nFrOCukaR1hkGtgXAkHKgCTOUubYku4Zi6kDaC+p7fD1oGFuLJOaPmn1KBMe3cGXh\n7CDNBSY9pQKBgE6uIXIOH5w2S5OeyJPXAlsxS+vq89jSS+dSc0TdUKqarlqVjBN1\niRlLwp35j+QJq5/ISyLQvYViGXQYQSZ4ZiHQefCbVW6Zx8dZap1dhKS6BTqBPIBZ\niabmV+ONa9wX/s0zerat5XdAed+3Hun5oO8WMIWz1ivgVvbfvtxbE+ahAoGBAN90\nIarqc1/AhklaveTK9GE3u1lK/klX82gRr4hrIVEkOPnmveDzIyDsnPilGtaQRh8X\nz6CmMNNyraVMLzQ3Z6EQQnerro1C9SZ2gY0tPxz4vsx+Mg/GhacD3ty9BbzOnV8H\nlvqqZ24ePNkVae87VWX4xKJabIBCB+pCnMkhCv61AoGBANf4CRkQK/gZRPjraiPq\naAi/H+HNt7bBuI9zbtH0JHhs7L3nafLxXk3hVkO+vDbyc/CFdEDCFiTgHVLJHV6P\n1yCWf0Y1w0yzAjGJscAqu3mBKX6EhrZsfRuNyWZuQJSejb/yc0NxpPlzuG6+iUau\nGrWZo85mJYgEISNI+Y1BRmXi\n-----END PRIVATE KEY-----\n",
+  "client_email": "whatsapp-chatbot-calendar@weighty-forest-467414-i7.iam.gserviceaccount.com",
+  "client_id": "110747823205472743192",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/whatsapp-chatbot-calendar%40weighty-forest-467414-i7.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
