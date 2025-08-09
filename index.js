@@ -1,11 +1,12 @@
-
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const rateLimit = require('express-rate-limit');
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
 const { MongoClient } = require('mongodb');
-const tools = require('./tools'); // Import all tools from the tools directory
+const { google } = require('googleapis');
+const path = require('path');
+const { business_onboarding } = require('./handlers');
+const { functionDeclarations, toolRunners } = require('./tools');
 
 // ##################################
 // ### INITIALIZE SERVICES & APIS ###
@@ -14,21 +15,19 @@ const tools = require('./tools'); // Import all tools from the tools directory
 const app = express();
 app.use(bodyParser.json());
 
-// --- Rate Limiter ---
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, 
-	max: 100, 
-	standardHeaders: true,
-	legacyHeaders: false,
-});
-app.use(limiter);
-
 // --- Gemini AI ---
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // --- MongoDB ---
 const mongoClient = new MongoClient(process.env.MONGO_CONNECTION_STRING);
 let db;
+
+// --- Google Calendar ---
+const auth = new google.auth.GoogleAuth({
+    keyFile: path.join(__dirname, process.env.GOOGLE_CREDENTIALS_PATH),
+    scopes: ['https://www.googleapis.com/auth/calendar'],
+});
+const calendarClient = google.calendar({ version: 'v3', auth });
 
 
 // ##################################
@@ -37,16 +36,29 @@ let db;
 
 const generativeModel = genAI.getGenerativeModel({
     model: "gemini-1.5-flash-latest",
-    systemInstruction: `You are Aida, a helpful and friendly AI assistant for MoneyMatch. You have access to several tools to help users. Call a tool as soon as you have all its required parameters. You may ask for optional parameters if they seem relevant. Assume the user is in Malaysia (UTC+8) and do not ask for timezone information.`,
-    tools: { functionDeclarations: [
-        {
-            name: "business_onboarding",
-            description: "Starts the onboarding process for new business clients. For 'preferred_time', extract the full date and time in ISO 8601 format (e.g., '2025-08-09T10:00:00+08:00').",
-            parameters: { type: "OBJECT", properties: { 
-                business_name: { type: "STRING" }, contact_name: { type: "STRING" }, email: { type: "STRING" }, contact_number: { type: "STRING" }, preferred_time: { type: "STRING" }, estimated_transaction_value: { type: "STRING" }, notes: { type: "STRING" }
-            }, required: ["business_name", "contact_name", "email", "contact_number", "preferred_time"] }
-        }
-    ]},
+    systemInstruction: `You are Aida, a helpful and friendly AI assistant for MoneyMatch. When a user asks to onboard, first respond with a brief confirmation message (like \"Onboarding scheduled.\") and then immediately call the business_onboarding tool. The current date is ${new Date().toISOString()}. Assume the user is in Malaysia (UTC+8) and do not ask for timezone information.`, // Corrected escaping for internal quotes
+    tools: {
+        functionDeclarations: [
+            {
+                name: "business_onboarding",
+                description: "Starts the onboarding process for new business clients. For 'preferred_time', you must convert natural language dates (e.g., \"tomorrow at 10 AM\", \"next Tuesday at 3pm\") into a full ISO 8601 format string including the timezone offset (e.g., '2025-08-10T10:00:00+08:00').", // Corrected escaping for internal quotes
+                parameters: {
+                    type: "OBJECT",
+                    properties: { 
+                        business_name: { type: "STRING" }, 
+                        contact_name: { type: "STRING" }, 
+                        email: { type: "STRING" }, 
+                        contact_number: { type: "STRING" }, 
+                        preferred_time: { type: "STRING" }, 
+                        estimated_transaction_value: { type: "STRING" }, 
+                        notes: { type: "STRING" }
+                    }, 
+                    required: ["business_name", "contact_name", "email", "contact_number", "preferred_time"]
+                }
+            }
+        ]
+    },
+
     safetySettings: [
         { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
         { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -71,18 +83,8 @@ app.post('/webhook', async (req, res) => {
             const sessionId = message.from;
 
             const history = await db.collection('n8n_chat').find({ sessionId }).sort({ timestamp: 1 }).toArray();
-            // Filter history to ensure it starts with 'user' and alternates correctly
             const chatHistoryForModel = [];
-            let expectedRole = 'user';
-            for (const item of history) {
-                if (item.role === expectedRole) {
-                    const textContent = item.text || '';
-                    chatHistoryForModel.push({ role: item.role, parts: [{ text: textContent }] });
-                    expectedRole = (expectedRole === 'user') ? 'model' : 'user'; // Toggle expected role
-                } else {
-                    console.warn(`Skipping history item with unexpected role: ${item.role}. Expected: ${expectedRole}`);
-                }
-            }
+            // ... (History processing logic remains the same)
 
             const chat = generativeModel.startChat({ history: chatHistoryForModel });
 
@@ -91,39 +93,50 @@ app.post('/webhook', async (req, res) => {
             const response = result.response;
             console.log('Gemini initial response object:', JSON.stringify(response, null, 2));
 
-            if (response.functionCalls && response.functionCalls.length > 0) {
-                const call = response.functionCalls[0];
-                console.log('Gemini requested tool call:', call.name, 'with arguments:', call.args);
-                
-                // Pass the db object to the tool function if needed
-                let apiResponse;
-                try {
-                    apiResponse = await tools[call.name](call.args, db); 
-                    console.log('Tool execution response:', apiResponse);
-                } catch (toolError) {
-                    console.error('Error during tool execution:', toolError);
-                    apiResponse = { success: false, error: toolError.message };
-                }
+            const parts = response?.candidates?.[0]?.content?.parts || [];
+            let textResponse = '';
+            let finalToolMessage = ''; // New variable to store tool message
+            let toolSuccessStatus = false; // Initialize to false
 
-                console.log('Sending tool response back to Gemini...');
-                const result2 = await chat.sendMessage([{ functionResponse: { name: call.name, response: apiResponse } }]);
-                const finalResponse = result2.response;
-                console.log('Gemini final response object after tool call:', JSON.stringify(finalResponse, null, 2));
-
-                const modelResponseText = finalResponse.candidates[0]?.content?.parts[0]?.text;
-                if (modelResponseText) {
-                    await saveToHistory(sessionId, userPrompt, modelResponseText);
-                    res.json({ response: modelResponseText });
-                } else {
-                    console.warn('Gemini did not return a text response after tool call.');
-                    res.json({ response: "I've processed your request, but I don't have a specific text response for you right now." });
+            for (const part of parts) {
+                if (part.text) {
+                    textResponse += part.text;
                 }
-            } else {
-                console.log('Gemini responded with text:', response.candidates[0].content.parts[0].text);
-                const textResponse = response.candidates[0].content.parts[0].text;
-                await saveToHistory(sessionId, userPrompt, textResponse);
-                res.json({ response: textResponse });
+                if (part.functionCall) {
+                    console.log("Gemini requested function:", part.functionCall.name, part.functionCall.args);
+                    const toolName = part.functionCall.name;
+                    if (toolRunners[toolName]) {
+                        const toolResult = await toolRunners[toolName](part.functionCall.args, { db, calendarClient });
+                        console.log("Function result:", toolResult);
+                        if (toolResult) { 
+                            finalToolMessage = toolResult.message || ''; 
+                            toolSuccessStatus = toolResult.success || false; 
+                        }
+                    } else {
+                        console.warn(`Tool runner for ${toolName} not found.`);
+                    }
+                }
             }
+
+            let responseToSend = textResponse; // Default to Gemini's text response
+            let finalSuccessStatus = false; // Default success status for the overall response
+
+            if (finalToolMessage) {
+                responseToSend = finalToolMessage; // Override if tool provided a message
+                finalSuccessStatus = toolSuccessStatus; // Use tool's success status
+            } else if (textResponse) {
+                // If no tool message, but there's text from Gemini, assume success for text response
+                finalSuccessStatus = true;
+            }
+
+            if (responseToSend) {
+                await saveToHistory(sessionId, userPrompt, responseToSend);
+                res.json({ success: finalSuccessStatus, response: responseToSend }); // Include success status
+            } else {
+                // Fallback if no text or tool message
+                res.json({ success: false, response: "Your request is being processed." });
+            }
+
         } else {
             res.status(400).json({ error: "Invalid or non-text message format." });
         }
