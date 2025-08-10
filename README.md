@@ -152,7 +152,6 @@ This is the easiest way to run the application consistently across different env
     ```bash
 docker compose up --build
     ```
-    This command builds your Docker image (if new or changed) and starts your application.
 
 2.  **Run (after initial build):**
     If you haven't changed your `Dockerfile` or `package.json` since the last build, you can just run:
