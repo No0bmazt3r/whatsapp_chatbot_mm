@@ -149,22 +149,23 @@ npm install
 This is the easiest way to run the application consistently across different environments.
 
 1.  **Build and Run (first time or after code changes):**
-    ```bash
+```bash
 docker compose up --build
-    ```
+```
+This command builds your Docker image (if new or changed) and starts your application.
 
 2.  **Run (after initial build):**
     If you haven't changed your `Dockerfile` or `package.json` since the last build, you can just run:
-    ```bash
+```bash
 docker compose up
-    ```
-    This will start your application using the existing image.
+```
+This will start your application using the existing image.
 
 3.  **Stop and Remove Containers:**
     To stop your application and remove the Docker containers, run:
-    ```bash
+```bash
 docker compose down
-    ```
+```
 
 Your application should now be accessible via `http://localhost:3000` (or the `PORT` you configured in your `.env` file).
 
